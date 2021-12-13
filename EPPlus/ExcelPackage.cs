@@ -525,7 +525,9 @@ namespace OfficeOpenXml
         /// </summary>
         private void Init()
         {
-            DoAdjustDrawings = true;
+             DoAdjustDrawings = true;
+            try
+            {
 #if (Core)
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);  //Add Support for codepage 1252
 
@@ -536,14 +538,19 @@ namespace OfficeOpenXml
 
             var v = c["EPPlus:ExcelPackage:Compatibility:IsWorksheets1Based"];
 #else
-            var v = ConfigurationManager.AppSettings["EPPlus:ExcelPackage.Compatibility.IsWorksheets1Based"];
+                var v = ConfigurationManager.AppSettings["EPPlus:ExcelPackage.Compatibility.IsWorksheets1Based"];
 #endif
-            if (v != null)
-            {
-                if(Boolean.TryParse(v.ToLowerInvariant(), out bool value))
+                if (v != null)
                 {
-                    Compatibility.IsWorksheets1Based = value;
+                    if (Boolean.TryParse(v.ToLowerInvariant(), out bool value))
+                    {
+                        Compatibility.IsWorksheets1Based = value;
+                    }
                 }
+            }
+            catch  
+            {//Fix bugs when there is no configuration file on other platforms
+                Compatibility.IsWorksheets1Based = true; 
             }
         }
         /// <summary>
